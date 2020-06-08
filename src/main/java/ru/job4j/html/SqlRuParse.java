@@ -5,22 +5,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 
 
 public class SqlRuParse {
     public static void main(String[] args) throws Exception {
-        Document doc = Jsoup.connect("https://www.sql.ru/forum/job-offers").get();
-        Elements postslisttopic = doc.select(".postslisttopic");
-        Elements dates = doc.select(".altCol").select("[style]");
-        for (int i = 0; i < postslisttopic.size(); i++) {
-            Element href = postslisttopic.get(i).child(0);
-            System.out.println(href.attr("href"));
-            System.out.println(href.text());
-            String stringTime = dates.get(i).text();
-            System.out.println(getDate(stringTime));
-        }
+        getPosts("https://www.sql.ru/forum/job", 5);
     }
 
     private static LocalDateTime getDate(String stringTime) {
@@ -46,4 +38,22 @@ public class SqlRuParse {
         int minutes = time[1];
         return LocalDateTime.of(year, month, day, hours, minutes);
     }
+
+    public static void getPosts(String link, int pagesCount) throws IOException {
+        int count = 0;
+        while (pagesCount > count) {
+            Document doc = Jsoup.connect(link + "/" + count).get();
+            Elements postslisttopic = doc.select(".postslisttopic");
+            Elements dates = doc.select(".altCol").select("[style]");
+            for (int i = 0; i < postslisttopic.size(); i++) {
+                Element href = postslisttopic.get(i).child(0);
+                System.out.println(href.attr("href"));
+                System.out.println(href.text());
+                String stringTime = dates.get(i).text();
+                System.out.println(getDate(stringTime));
+            }
+            count++;
+        }
+    }
+
 }
