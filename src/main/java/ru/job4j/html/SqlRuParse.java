@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class SqlRuParse {
     public static void main(String[] args) throws Exception {
-        getPosts("https://www.sql.ru/forum/job", 5);
+        getPosts("https://www.sql.ru/forum/job-offers", 5);
     }
 
     private static LocalDateTime getDate(String stringTime) {
@@ -49,17 +49,19 @@ public class SqlRuParse {
                 Element href = postslisttopic.get(i).child(0);
                 System.out.println(href.attr("href"));
                 System.out.println(href.text());
-                System.out.println(getDescription(href.attr("href")));
                 String stringTime = dates.get(i).text();
                 System.out.println(getDate(stringTime));
+                getDetails(href.attr("href"));
             }
             count++;
         }
     }
 
-    public static String getDescription(String link) throws IOException {
+    public static void getDetails(String link) throws IOException {
         Document doc = Jsoup.connect(link).get();
-        Elements descriptionElements = doc.select(".msgBody");
-        return descriptionElements.get(1).text();
+        System.out.println(doc.select(".msgBody").get(1).text());
+        String date = doc.selectFirst(".msgFooter").text().split(" \\[")[0];
+        System.out.println(getDate(date));
+
     }
 }
