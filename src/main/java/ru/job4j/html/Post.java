@@ -4,20 +4,20 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Post {
-    private int id;
+    private String url;
     private String name;
     private String description;
     private LocalDateTime created;
 
-    public Post(int id, String name, String description, LocalDateTime created) {
-        this.id = id;
+    public Post(String url, String name, String description, LocalDateTime created) {
+        this.url = url;
         this.name = name;
         this.description = description;
         this.created = created;
     }
 
-    public int getId() {
-        return id;
+    public String getId() {
+        return url;
     }
 
     public String getName() {
@@ -37,7 +37,7 @@ public class Post {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Post post = (Post) o;
-        return id == post.id &&
+        return Objects.equals(url, post.url) &&
                 Objects.equals(name, post.name) &&
                 Objects.equals(description, post.description) &&
                 Objects.equals(created, post.created);
@@ -45,13 +45,13 @@ public class Post {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, created);
+        return Objects.hash(url, name, description, created);
     }
 
     @Override
     public String toString() {
         return "Post{" +
-                "id=" + id +
+                "url=" + url +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", created=" + created +
