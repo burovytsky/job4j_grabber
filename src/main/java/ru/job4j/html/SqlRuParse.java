@@ -7,12 +7,14 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 
-public class SqlRuParse {
-    public static void main(String[] args) throws Exception {
-        getPosts("https://www.sql.ru/forum/job-offers", 5);
+public class SqlRuParse implements Parse{
+    public static void main(String[] args) {
+        List<Post> posts= new SqlRuParse().list("https://www.sql.ru/forum/job-offers");
     }
 
     private static LocalDateTime getDate(String stringTime) {
@@ -39,29 +41,38 @@ public class SqlRuParse {
         return LocalDateTime.of(year, month, day, hours, minutes);
     }
 
-    public static void getPosts(String link, int pagesCount) throws IOException {
+    @Override
+    public List<Post> list(String link) {
+        ArrayList<Post> result = new ArrayList<>();
         int count = 0;
-        while (pagesCount > count) {
-            Document doc = Jsoup.connect(link + "/" + count).get();
-            Elements postslisttopic = doc.select(".postslisttopic");
-            Elements dates = doc.select(".altCol").select("[style]");
-            for (int i = 0; i < postslisttopic.size(); i++) {
-                Element href = postslisttopic.get(i).child(0);
-                System.out.println(href.attr("href"));
-                System.out.println(href.text());
-                String stringTime = dates.get(i).text();
-                System.out.println(getDate(stringTime));
-                getDetails(href.attr("href"));
+        while (5 > count) {
+            try {
+                Document doc = Jsoup.connect(link + "/" + count).get();
+                Elements postslisttopic = doc.select(".postslisttopic");
+                for (Element element: postslisttopic){
+                    String postLink =  element.child(0).attr("href");
+                    result.add(detail(postLink));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
             count++;
         }
+        return result;
     }
 
-    public static void getDetails(String link) throws IOException {
-        Document doc = Jsoup.connect(link).get();
-        System.out.println(doc.select(".msgBody").get(1).text());
+    @Override
+    public Post detail(String link) {
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(link).get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String name = doc.select(".messageHeader").text();
+        String desc = doc.select(".msgBody").get(1).text();
         String date = doc.selectFirst(".msgFooter").text().split(" \\[")[0];
-        System.out.println(getDate(date));
-
+        LocalDateTime createdDate = getDate(date);
+        return new Post(link, name, desc, createdDate);
     }
 }
