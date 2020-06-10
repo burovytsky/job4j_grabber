@@ -16,7 +16,7 @@ public class Post {
         this.created = created;
     }
 
-    public String getId() {
+    public String getUrl() {
         return url;
     }
 
