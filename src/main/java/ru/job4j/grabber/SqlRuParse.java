@@ -5,16 +5,26 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 
-public class SqlRuParse implements Parse{
-    public static void main(String[] args) {
-        List<Post> posts= new SqlRuParse().list("https://www.sql.ru/forum/job-offers");
+public class SqlRuParse implements Parse {
+    public static void main(String[] args) throws IOException {
+        //демонстрация работы PsqlStore
+
+        Properties properties = new Properties();
+        try (FileInputStream in = new FileInputStream("src/main/resources/app.properties")) {
+            properties.load(in);
+        }
+        PsqlStore psqlStore = new PsqlStore(properties);
+        new SqlRuParse().list("https://www.sql.ru/forum/job-offers").forEach(psqlStore::save);
+
     }
 
     private static LocalDateTime getDate(String stringTime) {
@@ -44,14 +54,17 @@ public class SqlRuParse implements Parse{
     @Override
     public List<Post> list(String link) {
         ArrayList<Post> result = new ArrayList<>();
-        int count = 0;
-        while (5 > count) {
+        int count = 1;
+        while (6 > count) {
             try {
                 Document doc = Jsoup.connect(link + "/" + count).get();
                 Elements postslisttopic = doc.select(".postslisttopic");
-                for (Element element: postslisttopic){
-                    String postLink =  element.child(0).attr("href");
-                    result.add(detail(postLink));
+                for (Element element : postslisttopic) {
+                    String name = element.child(0).text();
+                    if (name.matches("(?i).*java.*") && !name.matches("(?i).*script.*")) {
+                        String postLink = element.child(0).attr("href");
+                        result.add(detail(postLink));
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -69,7 +82,7 @@ public class SqlRuParse implements Parse{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String name = doc.select(".messageHeader").text();
+        String name = doc.selectFirst(".messageHeader").text();
         String desc = doc.select(".msgBody").get(1).text();
         String date = doc.selectFirst(".msgFooter").text().split(" \\[")[0];
         LocalDateTime createdDate = getDate(date);
