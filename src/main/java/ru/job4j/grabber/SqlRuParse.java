@@ -5,27 +5,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-
 
 public class SqlRuParse implements Parse {
-    public static void main(String[] args) throws IOException {
-        //демонстрация работы PsqlStore
-
-        Properties properties = new Properties();
-        try (FileInputStream in = new FileInputStream("src/main/resources/app.properties")) {
-            properties.load(in);
-        }
-        PsqlStore psqlStore = new PsqlStore(properties);
-        new SqlRuParse().list("https://www.sql.ru/forum/job-offers").forEach(psqlStore::save);
-
-    }
 
     private static LocalDateTime getDate(String stringTime) {
         Map<String, Integer> months = Map.ofEntries(Map.entry("янв", 1), Map.entry("фев", 2),
