@@ -2,8 +2,8 @@ create database grabber;
 
 create table posts(
 id serial primary key,
-link text unique,
-name text,
+link varchar(128) unique,
+name varchar(128),
 description text,
 created timestamp
 );
