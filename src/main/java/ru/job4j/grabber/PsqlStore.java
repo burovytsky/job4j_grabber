@@ -11,20 +11,7 @@ public class PsqlStore implements Store, AutoCloseable {
     private Connection cnn;
 
     public PsqlStore(Properties cfg) {
-        try {
-            Class.forName(cfg.getProperty("driver-class-name"));
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-        try {
-            cnn = DriverManager.getConnection(
-                    cfg.getProperty("url"),
-                    cfg.getProperty("username"),
-                    cfg.getProperty("password")
-            );
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        cnn = ConnectorDB.getConnection(cfg);
     }
 
     @Override
