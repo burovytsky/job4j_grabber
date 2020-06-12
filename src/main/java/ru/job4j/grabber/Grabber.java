@@ -1,4 +1,5 @@
 package ru.job4j.grabber;
+
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
@@ -12,7 +13,7 @@ import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
-public class Grabber implements Grab{
+public class Grabber implements Grab {
     private final Properties cfg = new Properties();
 
     public Store store() {
@@ -26,7 +27,8 @@ public class Grabber implements Grab{
     }
 
     public void cfg() throws IOException {
-        try (InputStream in = new FileInputStream(new File("src/main/resources/app.properties"))) {
+        try (InputStream in = new FileInputStream(
+                new File("src/main/resources/app.properties"))) {
             cfg.load(in);
         }
     }
